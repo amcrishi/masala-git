@@ -1,5 +1,5 @@
 import { generateText } from 'ai';
-import { gemini } from '@/lib/ai';
+import { getGeminiModel } from '@/lib/ai';
 import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     const productNames = allProducts.map((p) => p.name).join(', ');
 
     const { text } = await generateText({
-      model: gemini,
+      model: getGeminiModel(),
       prompt: `A customer is viewing "${currentProduct.name}" (${currentProduct.category}).
 From this list of available products: ${productNames}
 Pick the 4 most complementary products that go well with "${currentProduct.name}" for Indian cooking.

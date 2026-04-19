@@ -1,12 +1,15 @@
 import { generateText } from 'ai';
-import { gemini } from '@/lib/ai';
+import { getGeminiModel } from '@/lib/ai';
 import { authorizeRequest } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
     if (!process.env.GOOGLE_AI_API_KEY) {
-      return NextResponse.json({ success: false, error: 'AI service not configured. Add GOOGLE_AI_API_KEY to environment variables.' }, { status: 503 });
+      return NextResponse.json({
+        success: false,
+        error: 'AI not configured — add GOOGLE_AI_API_KEY in Vercel Environment Variables and redeploy.',
+      }, { status: 503 });
     }
 
     const authResult = await authorizeRequest(request, 'admin', 'technician');
@@ -18,7 +21,7 @@ export async function POST(request: Request) {
     }
 
     const { text } = await generateText({
-      model: gemini,
+      model: getGeminiModel(),
       prompt: `Write a compelling product description for an Indian spice/masala product to be used on an e-commerce website.
 
 Product name: "${name}"
@@ -37,6 +40,12 @@ Requirements:
     return NextResponse.json({ success: true, description: text.trim() });
   } catch (error) {
     console.error('Description generation error:', error);
-    return NextResponse.json({ success: false, error: 'Failed to generate description' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    const userMsg = msg.includes('API key') || msg.includes('api_key') || msg.includes('API_KEY')
+      ? 'Invalid or missing GOOGLE_AI_API_KEY. Get a free key at aistudio.google.com/app/apikey'
+      : msg.includes('quota') || msg.includes('429')
+      ? 'Gemini quota exceeded. Try again in a moment.'
+      : `AI error: ${msg}`;
+    return NextResponse.json({ success: false, error: userMsg }, { status: 500 });
   }
 }

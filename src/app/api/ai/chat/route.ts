@@ -1,5 +1,5 @@
 import { streamText } from 'ai';
-import { gemini } from '@/lib/ai';
+import { getGeminiModel } from '@/lib/ai';
 import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
@@ -44,7 +44,7 @@ Guidelines:
 - Respond in the same language the user writes in (English or Hinglish is fine)`;
 
     const result = streamText({
-      model: gemini,
+      model: getGeminiModel(),
       system: systemPrompt,
       messages,
       maxOutputTokens: 300,
