@@ -7,6 +7,7 @@ import Image from 'next/image';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import ProductRecommendations from '@/components/ai/ProductRecommendations';
 import type { IProduct } from '@/types';
 
 const categoryLabels: Record<string, string> = {
@@ -293,6 +294,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           )}
         </div>
       </div>
+
+      {/* AI Recommendations */}
+      <ProductRecommendations productId={id} />
     </div>
   );
 }

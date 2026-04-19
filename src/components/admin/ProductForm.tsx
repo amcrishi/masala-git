@@ -26,6 +26,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [generatingDesc, setGeneratingDesc] = useState(false);
   const [error, setError] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [imagePreviews, setImagePreviews] = useState<string[]>(product?.images || []);
@@ -40,6 +41,32 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const generateDescription = async () => {
+    if (!formData.name.trim()) {
+      setError('Enter a product name first to generate a description');
+      return;
+    }
+    setGeneratingDesc(true);
+    setError('');
+    try {
+      const res = await fetch('/api/ai/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formData.name, category: formData.category }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFormData((prev) => ({ ...prev, description: data.description }));
+      } else {
+        setError(data.error || 'Failed to generate description');
+      }
+    } catch {
+      setError('AI service unavailable');
+    } finally {
+      setGeneratingDesc(false);
+    }
   };
 
   const uploadFiles = useCallback(async (files: FileList | File[]) => {
@@ -309,7 +336,27 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-sm font-semibold text-gray-700">Description</label>
+            <button
+              type="button"
+              onClick={generateDescription}
+              disabled={generatingDesc}
+              className="flex items-center gap-1.5 text-xs bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white px-3 py-1.5 rounded-lg transition-all disabled:opacity-50 font-medium"
+            >
+              {generatingDesc ? (
+                <>
+                  <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Generating...
+                </>
+              ) : (
+                <>✨ Generate with AI</>
+              )}
+            </button>
+          </div>
           <textarea
             name="description"
             value={formData.description}
@@ -317,7 +364,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
             required
             rows={4}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none text-gray-900"
-            placeholder="Describe the product..."
+            placeholder="Describe the product, or click ✨ Generate with AI above..."
           />
         </div>
 
