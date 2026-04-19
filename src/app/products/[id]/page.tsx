@@ -27,6 +27,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [quantity, setQuantity] = useState(1);
   const [ordering, setOrdering] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [imgErrors, setImgErrors] = useState<Record<number, boolean>>({});
   const { user } = useAuth();
   const { addToCart } = useCart();
   const router = useRouter();
@@ -101,7 +102,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <div className="space-y-4">
           {/* Main Image */}
           <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl overflow-hidden h-80 md:h-[480px] shadow-lg">
-            {allImages.length > 0 ? (
+            {allImages.length > 0 && !imgErrors[activeImage] ? (
               <Image
                 src={allImages[activeImage] || allImages[0]}
                 alt={product.name}
@@ -109,6 +110,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 className="object-cover transition-all duration-500"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
+                onError={() => setImgErrors((prev) => ({ ...prev, [activeImage]: true }))}
               />
             ) : (
               <div className="flex items-center justify-center h-full">
