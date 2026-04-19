@@ -64,7 +64,7 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-10 right-10 text-9xl">🌿</div>
           <div className="absolute bottom-10 right-40 text-8xl">🌶️</div>
           <div className="absolute top-40 right-60 text-7xl">✨</div>
