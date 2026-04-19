@@ -35,7 +35,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authResult = await authorizeRequest(request, 'admin');
+    const authResult = await authorizeRequest(request, 'admin', 'technician');
     if ('error' in authResult) return authResult.error;
 
     await dbConnect();

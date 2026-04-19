@@ -18,7 +18,7 @@ const useCloudinary = !!(
 
 export async function POST(request: Request) {
   try {
-    const authResult = await authorizeRequest(request, 'admin');
+    const authResult = await authorizeRequest(request, 'admin', 'technician');
     if ('error' in authResult) return authResult.error;
 
     const formData = await request.formData();

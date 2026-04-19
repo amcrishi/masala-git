@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'AI service not configured. Add GOOGLE_AI_API_KEY to environment variables.' }, { status: 503 });
     }
 
-    const authResult = await authorizeRequest(request, 'technician');
+    const authResult = await authorizeRequest(request, 'admin', 'technician');
     if ('error' in authResult) return authResult.error;
 
     const { name, category } = await request.json();

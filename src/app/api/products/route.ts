@@ -37,7 +37,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const authResult = await authorizeRequest(request, 'admin');
+    const authResult = await authorizeRequest(request, 'admin', 'technician');
     if ('error' in authResult) return authResult.error;
 
     await dbConnect();
